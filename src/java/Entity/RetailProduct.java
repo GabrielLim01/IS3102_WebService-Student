@@ -10,7 +10,7 @@ public class RetailProduct {
     private String type;
     private String category;
     private Double price;
-
+   
     public Double getPrice() {
         return price;
     }
