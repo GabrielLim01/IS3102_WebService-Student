@@ -33,6 +33,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -218,4 +219,130 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
         return em;
     }
 
+    // Added code
+    @GET
+    @Path("getMember")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response getMember(@QueryParam("email") String email) {
+
+        Member member = null;
+        Connection conn = null;
+
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String pStr = "SELECT * FROM memberentity WHERE email=?";
+
+            PreparedStatement pstmt = conn.prepareStatement(pStr);
+
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                rs.first();
+                member = new Member();
+                member.setId(rs.getLong("id"));
+                member.setName(rs.getString("name"));
+                member.setEmail(rs.getString("email"));
+                //member.setLoyaltyPoints(rs.getInt("loyaltyPoints"));
+                //member.setCumulativeSpending(rs.getDouble("cumulativeSpending"));
+                member.setPhone(rs.getString("phone"));
+                member.setCity(rs.getString("city"));
+                member.setAddress(rs.getString("address"));
+                member.setSecurityQuestion(Integer.valueOf(rs.getString("securityQuestion")));
+                member.setSecurityAnswer(rs.getString("securityAnswer"));
+                member.setAge(Integer.valueOf(rs.getString("age")));
+                member.setIncome(Integer.valueOf(rs.getString("income")));
+            }
+
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close(); //Close connection
+            } catch (Exception e) {
+            }
+        }
+
+        GenericEntity<Member> entity = new GenericEntity<Member>(member) {
+        };
+
+        return Response.status(200).entity(entity).build();
+    }
+
+    // Added code
+    @GET
+    @Path("getMemberName")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response getMemberName(@QueryParam("email") String email) {
+
+        String memberName = "";
+        Connection conn = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+            String pStr = "SELECT name FROM memberentity WHERE email=?";
+
+            PreparedStatement pstmt = conn.prepareStatement(pStr);
+
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+
+            rs.next();
+            memberName = rs.getString("name");
+
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close(); //Close connection
+            } catch (Exception e) {
+            }
+        }
+
+        return Response.status(200).entity(memberName).build();
+    }
+
+    //Added code
+    @GET
+    @Path("updateProfile")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response updateProfile(@QueryParam("id") int id, @QueryParam("name") String name, @QueryParam("phone") String phone, @QueryParam("country") String country, @QueryParam("address") String address, @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") int age, @QueryParam("income") int income) {
+
+        String updateStatus = "";
+        Connection conn = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+
+            String pStr = "UPDATE memberentity SET name = ?, phone = ?, city = ?, address = ?, securityanswer = ?, age = ?, income = ? where id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(pStr);
+            pstmt.setString(1, name);
+            pstmt.setString(2, phone);
+            pstmt.setString(3, country);
+            pstmt.setString(4, address);
+            pstmt.setString(5, securityAnswer);
+            pstmt.setInt(6, age);
+            pstmt.setInt(7, income);
+            pstmt.setInt(8, id);
+            int count = pstmt.executeUpdate();
+
+            if (count > 0) {
+                updateStatus = "Success";
+            }
+
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close(); //Close connection
+            } catch (Exception e) {
+            }
+        }
+
+        return Response.status(200).entity(updateStatus).build();
+    }
 }

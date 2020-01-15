@@ -7,7 +7,7 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2019-07-15T13:46:46")
+@Generated(value="EclipseLink-2.5.2.v20140319-rNA", date="2020-01-15T12:05:54")
 @StaticMetamodel(Lineitementity.class)
 public class Lineitementity_ { 
 
