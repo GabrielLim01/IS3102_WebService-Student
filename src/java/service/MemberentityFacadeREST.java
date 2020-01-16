@@ -345,4 +345,45 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
 
         return Response.status(200).entity(updateStatus).build();
     }
+    
+     //Added code
+    @GET
+    @Path("updatePassword")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response updateProfile(@QueryParam("id") int id, @QueryParam("password") String password) {
+
+        String passwordUpdated = "";
+        String passwordSalt = "";
+        String passwordHash = "";
+        Connection conn = null;
+
+        try {
+            passwordSalt = generatePasswordSalt();
+            passwordHash = generatePasswordHash(passwordSalt, password);
+            
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/islandfurniture-it07?zeroDateTimeBehavior=convertToNull&user=root&password=12345");
+
+            String pStr = "UPDATE memberentity SET passwordsalt = ?, passwordhash = ? where id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(pStr);
+            pstmt.setString(1, passwordSalt);
+            pstmt.setString(2, passwordHash);
+            pstmt.setInt(3, id);
+            int count = pstmt.executeUpdate();
+
+            if (count > 0) {
+                passwordUpdated = "Success";
+            }
+
+        } catch (Exception e) {
+        } finally {
+            try {
+                conn.close(); //Close connection
+            } catch (Exception e) {
+            }
+        }
+
+        return Response.status(200).entity(passwordUpdated).build();
+    }
 }
